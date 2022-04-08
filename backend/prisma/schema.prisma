@@ -88,3 +88,9 @@ model Categories {
   updatedAt DateTime @default(now()) @db.DateTime(0)
   Jobs      Jobs[]
 }
+
+model RefreshTokens {
+  id        Int      @id @default(autoincrement())
+  token      String   @db.VarChar(255)
+  createdAt DateTime @default(now()) @db.DateTime(0)
+}
