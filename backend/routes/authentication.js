@@ -29,7 +29,7 @@ router.post("/login", async (req, res) => {
     } else {
       const validPassword = await bcrypt.compare(password, user.password);
       if (!validPassword) {
-        return res.status(400).json({ message: "Password not valid" });
+        return res.status(400).json({ error: "Password not valid" });
       }
     }
 
@@ -50,7 +50,9 @@ router.post("/login", async (req, res) => {
         refreshToken,
       });
     } else {
-      res.status(400).json("Username or password incorrect!");
+      res.status(400).json({
+        error: "Invalid username or password",
+      });
     }
   } catch (error) {
     console.log(error);

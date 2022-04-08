@@ -5,10 +5,12 @@ const helmet = require("helmet");
 const app = express();
 const authRoute = require("./routes/authentication");
 const verify = require("./utils/auth");
+const cors = require("cors");
 
 app.use(express.json());
 app.use(helmet());
 app.use(morgan("common"));
+app.use(cors());
 
 app.listen({ port: 4500 }, () => {
   console.log("Server running on port 4500");
