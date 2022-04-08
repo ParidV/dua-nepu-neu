@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Applications {
+  id                  Int     @id @default(autoincrement())
+  userId              Int
+  jobId               Int
+  // 0=>pending, 1=>accepted, 2=>rejected
+  status              Int     @default(0)
+  coverLetterDocument String?
+
+
+  createdAt DateTime @default(now()) @db.DateTime(0)
+  updatedAt DateTime @default(now()) @db.DateTime(0)
+
+  jobs  Jobs  @relation(fields: [jobId], references: [id], onUpdate: Cascade, onDelete: Cascade, map: "jobId")
+  users Users @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade, map: "userId")
+
+  @@index([jobId], map: "jobId")
+  @@index([userId], map: "userId")
+}
+
+model Jobs {
+  id                   Int            @id @default(autoincrement())
+  userId               Int
+  User                 Users?         @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  categoryId           Int
+  Category             Categories?    @relation(fields: [categoryId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  title                String         @db.VarChar(255)
+  start_of_application DateTime       @db.DateTime(0)
+  end_of_application   DateTime?      @db.DateTime(0)
+  // 1=Fulltime 2=Parttime 3=Internship 4=Freelance
+  type                 Int
+  country              String         @db.VarChar(255)
+  city                 String         @db.VarChar(255)
+  salary               Decimal?       @db.Decimal(15, 2)
+  previous_experience  Int?
+  description          String         @db.VarChar(255)
+  notes                String         @db.VarChar(255)
+  requirements         String         @db.VarChar(255)
+  // 0=>Not required, 1=>Required, 2=>Optional
+  coverLetter          Int            @default(0)
+  is_active            Boolean        @default(true)
+  // 1=>In presence (office)  2=>Remote working (Home) 3=>Hybrid (Office & Home)
+  place_of_work        Int
+  createdAt            DateTime       @default(now()) @db.DateTime(0)
+  updatedAt            DateTime       @default(now()) @db.DateTime(0)
+  applications         Applications[]
+}
+
+model Users {
+  id                  Int            @id @default(autoincrement())
+  name                String         @db.VarChar(255)
+  surname             String         @db.VarChar(255)
+  email               String         @unique(map: "email") @db.VarChar(255)
+  password            String         @db.VarChar(255)
+  avatar              String?        @db.VarChar(255)
+  phone               String         @db.VarChar(255)
+  country             String         @db.VarChar(255)
+  city                String         @db.VarChar(255)
+  address             String         @db.VarChar(255)
+  zip                 String?        @db.VarChar(255)
+  // ROLE 1=> user(job finder), 2=> company(job provider), 3=> admin
+  role                Int            @default(1)
+  number_of_employers Int?
+  dob                 DateTime       @db.DateTime(0)
+  description         String?        @db.Text
+  cv                  String?        @db.Text
+  createdAt           DateTime       @default(now()) @db.DateTime(0)
+  updatedAt           DateTime       @default(now()) @db.DateTime(0)
+  applications        Applications[]
+  Categories          Categories[]
+  Jobs                Jobs[]
+}
+
+model Categories {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(255)
+  userId    Int
+  User      Users?   @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+  createdAt DateTime @default(now()) @db.DateTime(0)
+  updatedAt DateTime @default(now()) @db.DateTime(0)
+  Jobs      Jobs[]
+}
