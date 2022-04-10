@@ -16,6 +16,8 @@ import Snackbar from "@mui/material/Snackbar";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { login } from "../redux/user/userSlice";
 
 const validationSchema = yup.object({
   email: yup
@@ -33,6 +35,7 @@ const loginLogic = (values) => {
 };
 
 export default function Login() {
+  const dispatch = useDispatch();
   let navigate = useNavigate();
   const [openSuccess, setOpenSuccess] = useState(false);
   const [openSuccessMessage, setOpenSuccessMessage] = useState("");
@@ -52,6 +55,7 @@ export default function Login() {
             localStorage.setItem("token", res.data.accessToken);
             console.log(res.data);
             setOpenSuccessMessage("Login Successful");
+            dispatch(login(res.data.user));
 
             navigate("/");
           }
