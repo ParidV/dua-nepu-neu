@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useContext } from "react";
+import React, { useState } from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -45,30 +45,30 @@ export default function Login() {
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
+      loginLogic(values)
+        .then((res) => {
+          if (res.status === 200) {
+            // set localstorage
+            localStorage.setItem("token", res.data.accessToken);
+            console.log(res.data);
+            setOpenSuccessMessage("Login Successful");
 
-      console.log(values);
-
-      // loginLogic(values)
-      //   .then((res) => {
-      //     if (res.status === 200) {
-      //       setOpenSuccessMessage("Login Successful");
-
-      //       navigate("/protected");
-      //     }
-      //     console.log(res.data);
-      //   })
-      //   .catch((err) => {
-      //     if (!err?.response) {
-      //       setOpenErrorMessage("No Server Response");
-      //     } else if (err.response?.status === 400) {
-      //       setOpenErrorMessage("Missing Username or Password");
-      //     } else if (err.response?.status === 401) {
-      //       setOpenErrorMessage("Unauthorized");
-      //     } else {
-      //       setOpenErrorMessage("Login Failed");
-      //     }
-      //     setOpenError(true);
-      //   });
+            navigate("/");
+          }
+          console.log(res.data);
+        })
+        .catch((err) => {
+          if (!err?.response) {
+            setOpenErrorMessage("No Server Response");
+          } else if (err.response?.status === 400) {
+            setOpenErrorMessage("Missing Username or Password");
+          } else if (err.response?.status === 401) {
+            setOpenErrorMessage("Unauthorized");
+          } else {
+            setOpenErrorMessage("Login Failed");
+          }
+          setOpenError(true);
+        });
     },
   });
 
