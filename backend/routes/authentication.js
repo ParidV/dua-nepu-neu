@@ -44,10 +44,15 @@ router.post("/login", async (req, res) => {
       });
 
       res.json({
-        username: user.username,
-        isAdmin: user.isAdmin,
         accessToken,
         refreshToken,
+        user: {
+          id: user.id,
+          name: user.name,
+          surname: user.surname,
+          email: user.email,
+          role: user.role,
+        },
       });
     } else {
       res.status(400).json({

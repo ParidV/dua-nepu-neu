@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useRef, useState, useEffect, useContext } from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -15,6 +15,7 @@ import Stack from "@mui/material/Stack";
 import Snackbar from "@mui/material/Snackbar";
 import { useFormik } from "formik";
 import * as yup from "yup";
+import { useNavigate } from "react-router-dom";
 
 const validationSchema = yup.object({
   email: yup
@@ -32,10 +33,11 @@ const loginLogic = (values) => {
 };
 
 export default function Login() {
-  const [openSuccess, setOpenSuccess] = React.useState(false);
-  const [openSuccessMessage, setOpenSuccessMessage] = React.useState("");
-  const [openError, setOpenError] = React.useState(false);
-  const [openErrorMessage, setOpenErrorMessage] = React.useState("");
+  let navigate = useNavigate();
+  const [openSuccess, setOpenSuccess] = useState(false);
+  const [openSuccessMessage, setOpenSuccessMessage] = useState("");
+  const [openError, setOpenError] = useState(false);
+  const [openErrorMessage, setOpenErrorMessage] = useState("");
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -43,18 +45,30 @@ export default function Login() {
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
-      loginLogic(values)
-        .then((res) => {
-          if (res.status === 200) {
-            setOpenSuccessMessage("Login Successful");
-            setOpenSuccess(true);
-          }
-          console.log(res.data);
-        })
-        .catch((err) => {
-          console.log(err);
-          setOpenError(true);
-        });
+
+      console.log(values);
+
+      // loginLogic(values)
+      //   .then((res) => {
+      //     if (res.status === 200) {
+      //       setOpenSuccessMessage("Login Successful");
+
+      //       navigate("/protected");
+      //     }
+      //     console.log(res.data);
+      //   })
+      //   .catch((err) => {
+      //     if (!err?.response) {
+      //       setOpenErrorMessage("No Server Response");
+      //     } else if (err.response?.status === 400) {
+      //       setOpenErrorMessage("Missing Username or Password");
+      //     } else if (err.response?.status === 401) {
+      //       setOpenErrorMessage("Unauthorized");
+      //     } else {
+      //       setOpenErrorMessage("Login Failed");
+      //     }
+      //     setOpenError(true);
+      //   });
     },
   });
 
