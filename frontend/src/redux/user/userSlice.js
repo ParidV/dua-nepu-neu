@@ -12,7 +12,7 @@ export const userSlice = createSlice({
       state.isLoggedIn = true;
     },
     logout: (state) => {
-      state.user = false;
+      state.user = null;
       state.isLoggedIn = false;
     },
   },

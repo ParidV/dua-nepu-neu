@@ -56,7 +56,6 @@ export default function Login() {
             console.log(res.data);
             setOpenSuccessMessage("Login Successful");
             dispatch(login(res.data.user));
-
             navigate("/");
           }
           console.log(res.data);

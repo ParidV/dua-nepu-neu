@@ -8,6 +8,7 @@ const {
   generateRefreshToken,
   authenticated,
 } = require("../utils/auth");
+const req = require("express/lib/request");
 
 router.post("/login", async (req, res) => {
   try {
@@ -100,6 +101,18 @@ router.post("/refresh", async (req, res) => {
       accessToken: newAccessToken,
       refreshToken: newRefreshToken,
     });
+  });
+});
+
+router.get("/user/current", (req, res) => {
+  // get token and send user info
+  const token = req.headers["token"];
+  console.log(token);
+  if (!token) return res.status(401).json("Access denied. No token provided.");
+
+  jwt.verify(token, "mySecretKey", (err, user) => {
+    if (err) return res.status(500).json("Invalid token.", err);
+    res.status(200).json(user);
   });
 });
 
