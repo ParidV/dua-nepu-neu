@@ -34,23 +34,10 @@ function App() {
 
   console.log(JSON.stringify(session) + isAuth);
 
+
   return (
     <div className="App">
       <Router>
-        <Link to="/">Home</Link>
-        <Link to="/login">login</Link>
-        <Link to="/profile">Home</Link>
-        <Link
-          to="/dd"
-          onClick={() => {
-            dispatch(logout());
-            localStorage.clear();
-            console.log("2");
-            console.log(JSON.stringify(session) + isAuth);
-          }}
-        >
-          logout
-        </Link>
         <Routes>
           <Route exact path="/" element={<Home />} />
           <Route exact path="login" element={<Login />} />
