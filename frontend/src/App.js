@@ -5,7 +5,7 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "./redux/user/userSlice";
 import { logout } from "./redux/user/userSlice";
-import { selectUser } from "./redux/user/userSlice";
+import Home from "./pages/user/Home";
 
 //Import the pages
 
@@ -52,7 +52,7 @@ function App() {
           logout
         </Link>
         <Routes>
-          <Route exact path="/" element={<h1>Home Page</h1>} />
+          <Route exact path="/" element={<Home />} />
           <Route exact path="login" element={<Login />} />
           <Route exact path="profile" element={<h1>Profile</h1>} />
         </Routes>

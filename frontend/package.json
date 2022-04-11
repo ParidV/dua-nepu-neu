@@ -5,6 +5,8 @@
   "dependencies": {
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
+    "@headlessui/react": "^1.5.0",
+    "@heroicons/react": "^1.0.6",
     "@mui/icons-material": "^5.6.0",
     "@mui/material": "^5.6.0",
     "@reduxjs/toolkit": "^1.8.1",
@@ -13,6 +15,7 @@
     "@testing-library/user-event": "^13.5.0",
     "axios": "^0.26.1",
     "formik": "^2.2.9",
+    "heroicons-react": "^1.4.1",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-redux": "^7.2.8",
