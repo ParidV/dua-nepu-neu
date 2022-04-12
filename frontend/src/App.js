@@ -1,4 +1,9 @@
-import { BrowserRouter as Router, Route, Link, Routes } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from "react-router-dom";
 import Login from "./pages/Login";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
@@ -14,6 +19,7 @@ import Protected from "./pages/Protected";
 function App() {
   const session = useSelector((state) => state.user.user);
   const isAuth = useSelector((state) => state.user.isLoggedIn);
+  const [loading, setLoading] = useState(true);
 
   const dispatch = useDispatch();
   let token = localStorage.getItem("token");
@@ -29,24 +35,34 @@ function App() {
           })
           .then((res) => {
             dispatch(login(res.data));
+            setLoading(false);
           });
       } else {
         dispatch(logout());
+        setLoading(false);
         console.log("no token");
       }
     }
     initializeToken();
-  }, []);
+  }, [dispatch]);
 
   console.log(JSON.stringify(session) + isAuth);
   console.log(session?.role + " XX S");
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="App">
       <Router>
         <Routes>
           <Route exact path="/" element={<Home />} />
-          <Route exact path="login" element={<Login />} />
+          <Route
+            exact
+            path="login"
+            element={session ? <Navigate to="/" /> : <Login />}
+          />
           <Route exact path="unauthorised" element={<Unauthorised />} />
           <Route
             element={

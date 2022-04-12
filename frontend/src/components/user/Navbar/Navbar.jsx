@@ -169,10 +169,10 @@ export default function NavBar() {
           <NavLink to="/services">Kërko</NavLink>
           <NavLink to="/contact-us">Kontakt</NavLink>
           {isAuth && session?.role === 2 && (
-            <NavLink to="/contact-us">Paneli Kompanisë</NavLink>
+            <NavLink to="/protected">Paneli Kompanisë</NavLink>
           )}{" "}
           {isAuth && session?.role === 3 && (
-            <NavLink to="/contact-us">Paneli Adminit</NavLink>
+            <NavLink to="/protected">Paneli Adminit</NavLink>
           )}
         </NavMenu>
         <NavBtn>
