@@ -5,9 +5,11 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "./redux/user/userSlice";
 import { logout } from "./redux/user/userSlice";
+import { initialState } from "./redux/user/userSlice";
 import Home from "./pages/user/Home";
-
-//Import the pages
+import Unauthorised from "./pages/Unauthorised";
+import RequireAuth from "./components/RequireAuth";
+import Protected from "./pages/Protected";
 
 function App() {
   const session = useSelector((state) => state.user.user);
@@ -16,24 +18,28 @@ function App() {
   const dispatch = useDispatch();
   let token = localStorage.getItem("token");
   useEffect(() => {
-    if (token) {
-      axios
-        .get(`http://localhost:4500/api/user/current`, {
-          headers: {
-            token: token,
-          },
-        })
-        .then((res) => {
-          dispatch(login(res.data));
-        });
-    } else {
-      dispatch(logout());
-      console.log("no token");
+    async function initializeToken() {
+      dispatch(initialState());
+      if (token) {
+        await axios
+          .get(`http://localhost:4500/api/user/current`, {
+            headers: {
+              token: token,
+            },
+          })
+          .then((res) => {
+            dispatch(login(res.data));
+          });
+      } else {
+        dispatch(logout());
+        console.log("no token");
+      }
     }
+    initializeToken();
   }, []);
 
   console.log(JSON.stringify(session) + isAuth);
-
+  console.log(session?.role + " XX S");
 
   return (
     <div className="App">
@@ -41,7 +47,14 @@ function App() {
         <Routes>
           <Route exact path="/" element={<Home />} />
           <Route exact path="login" element={<Login />} />
-          <Route exact path="profile" element={<h1>Profile</h1>} />
+          <Route exact path="unauthorised" element={<Unauthorised />} />
+          <Route
+            element={
+              <RequireAuth allowedRoles={[3]} session_role={session?.role} />
+            }
+          >
+            <Route path="/protected" element={<Protected />} />
+          </Route>
         </Routes>
       </Router>
     </div>
