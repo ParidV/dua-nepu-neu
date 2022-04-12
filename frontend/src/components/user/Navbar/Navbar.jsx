@@ -2,7 +2,6 @@
 import React from "react";
 // import { Navbar, Nav, Container } from "react-bootstrap";
 import { useSelector } from "react-redux";
-import * as ReactBootStrap from "react-bootstrap";
 import { logout } from "../../../redux/user/userSlice";
 import { useDispatch } from "react-redux";
 import {
@@ -13,29 +12,32 @@ import {
   NavBtn,
   NavBtnLink,
 } from "./NavbarElements";
+import {
+  Drawer,
+  List,
+  Divider,
+  IconButton,
+  ListItemText,
+  ListItemIcon,
+  ListItem,
+} from "@mui/material";
 import { Link } from "react-router-dom";
 import { styled } from "@mui/material/styles";
-import Drawer from "@mui/material/Drawer";
 
-import List from "@mui/material/List";
-import Divider from "@mui/material/Divider";
-import IconButton from "@mui/material/IconButton";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ListItem from "@mui/material/ListItem";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import CallOutlinedIcon from "@mui/icons-material/CallOutlined";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import LoginOutlinedIcon from "@mui/icons-material/LoginOutlined";
+import DisplaySettingsIcon from "@mui/icons-material/DisplaySettings";
 
 export default function NavBar() {
-  console.log(process.env.WEBPAGE_NAME + " S SS");
   const drawerWidth = 240;
   const dispatch = useDispatch();
   const session = useSelector((state) => state.user.user);
   const isAuth = useSelector((state) => state.user.isLoggedIn);
+
   const [open, setOpen] = React.useState(false);
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -56,7 +58,7 @@ export default function NavBar() {
     <>
       <Nav>
         <NavLink to="/">
-          {/* <img src={require("../../images/logo.svg")} alt="logo" /> */}
+          <img src={require("../../../images/logo.svg")} alt="logo" />
         </NavLink>
         <Bars onClick={!open ? handleDrawerOpen : handleDrawerClose} />
         <Drawer
@@ -109,7 +111,24 @@ export default function NavBar() {
               </ListItemIcon>
               <ListItemText primary={"Kontakt"} />
             </ListItem>
+            {isAuth && session?.role === 2 && (
+              <ListItem button key={"COMPANY_PANEL"}>
+                <ListItemIcon>
+                  <DisplaySettingsIcon />
+                </ListItemIcon>
+                <ListItemText primary={"Paneli Kompanisë"} />
+              </ListItem>
+            )}
+            {isAuth && session?.role === 3 && (
+              <ListItem button key={"COMPANY_PANEL"}>
+                <ListItemIcon>
+                  <DisplaySettingsIcon />
+                </ListItemIcon>
+                <ListItemText primary={"Paneli Adminit"} />
+              </ListItem>
+            )}
           </List>
+
           <Divider />
           <List>
             {isAuth ? (
@@ -149,6 +168,12 @@ export default function NavBar() {
           <NavLink to="/about">Faqja Kryesore</NavLink>
           <NavLink to="/services">Kërko</NavLink>
           <NavLink to="/contact-us">Kontakt</NavLink>
+          {isAuth && session?.role === 2 && (
+            <NavLink to="/contact-us">Paneli Kompanisë</NavLink>
+          )}{" "}
+          {isAuth && session?.role === 3 && (
+            <NavLink to="/contact-us">Paneli Adminit</NavLink>
+          )}
         </NavMenu>
         <NavBtn>
           {isAuth ? (
