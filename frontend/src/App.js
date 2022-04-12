@@ -18,7 +18,7 @@ function App() {
   useEffect(() => {
     if (token) {
       axios
-        .get("http://localhost:4500/api/user/current", {
+        .get(`http://localhost:4500/api/user/current`, {
           headers: {
             token: token,
           },
