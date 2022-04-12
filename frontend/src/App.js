@@ -12,34 +12,42 @@ import RequireAuth from "./components/RequireAuth";
 import Protected from "./pages/Protected";
 
 function App() {
-  const session = useSelector((state) => state.user.user);
-  const isAuth = useSelector((state) => state.user.isLoggedIn);
-
   const dispatch = useDispatch();
-  let token = localStorage.getItem("token");
+  let token = 1;
   useEffect(() => {
     async function initializeToken() {
-      dispatch(initialState());
       if (token) {
-        await axios
-          .get(`http://localhost:4500/api/user/current`, {
-            headers: {
-              token: token,
+        setTimeout(() => {
+          dispatch(login({
+            user: {
+              id: 'id',
+              name: 'name',
+              surname: 'surname',
+              email: 'email',
+              role: 'role',
             },
-          })
-          .then((res) => {
-            dispatch(login(res.data));
-          });
+          }))
+        }, 2000);
       } else {
         dispatch(logout());
         console.log("no token");
       }
     }
     initializeToken();
-  }, []);
+  }, [dispatch]);
 
-  console.log(JSON.stringify(session) + isAuth);
-  console.log(session?.role + " XX S");
+  // dispatch(initialState());
+  const session = useSelector((state) => state.user);
+ // const isAuth = useSelector((state) => state.user.isLoggedIn);
+
+  const sessionObject = session ? JSON.parse( JSON.stringify(session)) : null ;
+  console.log(sessionObject, 'sessionObject');
+
+  const isAuth = sessionObject ? sessionObject.isLoggedIn : null ;
+  console.log(isAuth + "isAuth");
+  const role = sessionObject ? sessionObject.user && session.user.user ? session.user.user.role : null : null
+  console.log(role, 'role')
+
 
   return (
     <div className="App">
