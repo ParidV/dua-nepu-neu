@@ -52,6 +52,7 @@ const authenticated = (req, res, next) => {
       if (err) {
         return res.status(403).json({
           message: "Access denied",
+          success: false,
         });
       }
 
@@ -60,7 +61,10 @@ const authenticated = (req, res, next) => {
       next();
     });
   } else {
-    res.status(401).json("You are not authenticated!");
+    res.status(401).json({
+      message: "You are not authenticated!",
+      success: false,
+    });
   }
 };
 
@@ -71,11 +75,13 @@ const user_auth = (req, res, next) => {
       if (err) {
         return res.status(403).json({
           message: "Access denied",
+          success: false,
         });
       }
       if (user.role !== 1) {
         return res.status(403).json({
           message: "Access denied",
+          success: false,
         });
       }
       req.user = user;
@@ -83,7 +89,10 @@ const user_auth = (req, res, next) => {
       next();
     });
   } else {
-    res.status(401).json("You are not authenticated!");
+    res.status(401).json({
+      message: "You are not authenticated!",
+      success: false,
+    });
   }
 };
 const company_auth = (req, res, next) => {
@@ -93,11 +102,13 @@ const company_auth = (req, res, next) => {
       if (err) {
         return res.status(403).json({
           message: "Access denied",
+          success: false,
         });
       }
       if (user.role !== 2) {
         return res.status(403).json({
           message: "Access denied",
+          success: false,
         });
       }
       req.user = user;
@@ -105,7 +116,10 @@ const company_auth = (req, res, next) => {
       next();
     });
   } else {
-    res.status(401).json("You are not authenticated!");
+    res.status(401).json({
+      message: "You are not authenticated!",
+      success: false,
+    });
   }
 };
 const admin_auth = (req, res, next) => {
@@ -115,11 +129,13 @@ const admin_auth = (req, res, next) => {
       if (err) {
         return res.status(403).json({
           message: "Access denied",
+          success: false,
         });
       }
       if (user.role !== 3) {
         return res.status(403).json({
           message: "Access denied",
+          success: false,
         });
       }
       req.user = user;
@@ -127,7 +143,10 @@ const admin_auth = (req, res, next) => {
       next();
     });
   } else {
-    res.status(401).json("You are not authenticated!");
+    res.status(401).json({
+      message: "You are not authenticated!",
+      success: false,
+    });
   }
 };
 
