@@ -14,7 +14,8 @@ import { initialState } from "./redux/user/userSlice";
 import Home from "./pages/user/Home";
 import Unauthorised from "./pages/Unauthorised";
 import RequireAuth from "./components/RequireAuth";
-import Protected from "./pages/Protected";
+import AdminDashboard from "./pages/admin";
+import CategoriesIndex from "./pages/admin/categories";
 
 function App() {
   const session = useSelector((state) => state.user.user);
@@ -61,15 +62,16 @@ function App() {
           <Route
             exact
             path="login"
-            element={session ? <Navigate to="/" /> : <Login />}
+            element={session ? <Navigate to="/" replace /> : <Login />}
           />
           <Route exact path="unauthorised" element={<Unauthorised />} />
           <Route
             element={
-              <RequireAuth allowedRoles={[3]} session_role={session?.role} />
+              <RequireAuth allowedRoles={3} session_role={session?.role} />
             }
           >
-            <Route path="/protected" element={<Protected />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/categories" element={<CategoriesIndex />} />
           </Route>
         </Routes>
       </Router>

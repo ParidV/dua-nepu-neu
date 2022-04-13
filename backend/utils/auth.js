@@ -46,12 +46,78 @@ const generateRefreshToken = (user) => {
 };
 
 const authenticated = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (authHeader) {
-    const token = authHeader.split(" ")[1];
-
+  const token = req.headers["token"];
+  if (token) {
     jwt.verify(token, "mySecretKey", (err, user) => {
       if (err) {
+        return res.status(403).json({
+          message: "Access denied",
+        });
+      }
+
+      req.user = user;
+      console.log(user);
+      next();
+    });
+  } else {
+    res.status(401).json("You are not authenticated!");
+  }
+};
+
+const user_auth = (req, res, next) => {
+  const token = req.headers["token"];
+  if (token) {
+    jwt.verify(token, "mySecretKey", (err, user) => {
+      if (err) {
+        return res.status(403).json({
+          message: "Access denied",
+        });
+      }
+      if (user.role !== 1) {
+        return res.status(403).json({
+          message: "Access denied",
+        });
+      }
+      req.user = user;
+      console.log(user);
+      next();
+    });
+  } else {
+    res.status(401).json("You are not authenticated!");
+  }
+};
+const company_auth = (req, res, next) => {
+  const token = req.headers["token"];
+  if (token) {
+    jwt.verify(token, "mySecretKey", (err, user) => {
+      if (err) {
+        return res.status(403).json({
+          message: "Access denied",
+        });
+      }
+      if (user.role !== 2) {
+        return res.status(403).json({
+          message: "Access denied",
+        });
+      }
+      req.user = user;
+      console.log(user);
+      next();
+    });
+  } else {
+    res.status(401).json("You are not authenticated!");
+  }
+};
+const admin_auth = (req, res, next) => {
+  const token = req.headers["token"];
+  if (token) {
+    jwt.verify(token, "mySecretKey", (err, user) => {
+      if (err) {
+        return res.status(403).json({
+          message: "Access denied",
+        });
+      }
+      if (user.role !== 3) {
         return res.status(403).json({
           message: "Access denied",
         });
@@ -69,4 +135,7 @@ module.exports = {
   generateAccessToken,
   generateRefreshToken,
   authenticated,
+  user_auth,
+  company_auth,
+  admin_auth,
 };

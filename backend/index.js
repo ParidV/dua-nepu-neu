@@ -4,6 +4,7 @@ const dotenv = require("dotenv").config();
 const helmet = require("helmet");
 const app = express();
 const authRoute = require("./routes/authentication");
+const admin_categories_routes = require("./routes/admin/categories/index");
 const verify = require("./utils/auth");
 const cors = require("cors");
 
@@ -17,8 +18,7 @@ app.listen({ port: 4500 }, () => {
 });
 
 app.use("/api", authRoute);
-
-
+app.use("/api/admin/categories", admin_categories_routes);
 
 // app.post("/api/logout", verify, (req, res) => {
 //   const refreshToken = req.body.token;

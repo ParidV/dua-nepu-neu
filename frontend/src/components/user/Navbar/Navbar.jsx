@@ -172,7 +172,7 @@ export default function NavBar() {
             <NavLink to="/protected">Paneli Kompanisë</NavLink>
           )}{" "}
           {isAuth && session?.role === 3 && (
-            <NavLink to="/protected">Paneli Adminit</NavLink>
+            <NavLink to="/admin">Paneli Adminit</NavLink>
           )}
         </NavMenu>
         <NavBtn>
