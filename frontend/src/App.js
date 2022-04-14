@@ -17,6 +17,7 @@ import RequireAuth from "./components/RequireAuth";
 import AdminDashboard from "./pages/admin";
 import CategoriesIndex from "./pages/admin/categories";
 
+
 function App() {
   const session = useSelector((state) => state.user.user);
   const isAuth = useSelector((state) => state.user.isLoggedIn);

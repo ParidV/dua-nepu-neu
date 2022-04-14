@@ -37,7 +37,18 @@ const storeCategories = async (req, res) => {
 };
 const getAllCategories = async (req, res) => {
   try {
-    const categories = await prisma.categories.findMany();
+    const categories = await prisma.categories.findMany({
+      include: {
+        User: {
+          select: {
+            id: true,
+            name: true,
+            surname: true,
+            email: true,
+          },
+        },
+      },
+    });
     return res.status(200).json(categories);
   } catch (error) {
     return res.status(404).json({
