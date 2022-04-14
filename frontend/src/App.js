@@ -30,7 +30,7 @@ function App() {
         dispatch(initialState());
         if (token) {
           await axios
-            .get(`http://localhost:4500/api/user/current`, {
+            .get(`${process.env.REACT_APP_API_URL}/user/current`, {
               headers: {
                 token: token,
               },

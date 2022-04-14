@@ -116,7 +116,7 @@ router.get("/user/current", (req, res) => {
   });
 });
 
-router.get("/test", authenticated, (req, res) => {
+router.get("/test", (req, res) => {
   res.json("Test");
 });
 

@@ -36,7 +36,12 @@ export default function CategoriesIndex() {
     const fetchData = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:4500/api/admin/categories`
+          `${process.env.REACT_APP_API_URL}/admin/categories`,
+          {
+            headers: {
+              token: `${localStorage.getItem("token")}`,
+            },
+          }
         );
         console.log(res.data);
       } catch (error) {

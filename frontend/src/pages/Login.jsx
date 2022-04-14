@@ -31,7 +31,7 @@ const validationSchema = yup.object({
 });
 
 const loginLogic = (values) => {
-  return axios.post("http://localhost:4500/api/login", values);
+  return axios.post(`${process.env.REACT_APP_API_URL}/login`, values);
 };
 
 export default function Login() {
