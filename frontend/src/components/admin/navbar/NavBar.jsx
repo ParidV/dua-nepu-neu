@@ -29,15 +29,10 @@ export default function NavBar() {
             </Offcanvas.Header>
             <Offcanvas.Body>
               <Nav className="justify-content-end flex-grow-1 pe-3">
-                {/* <Nav.Link href="http://localhost:3000/admin/">
-                  Faqja Kryesore
-                </Nav.Link> */}
                 <Link to="/admin" id="offcanvasNavbarDropdown">
                   Faqja Kryesore
                 </Link>
-                {/* <Link href="/admin/jobs" id="offcanvasNavbarDropdown">
-                  <a>Punët</a>
-                </Link> */}
+
                 <NavDropdown title="Punët" id="offcanvasNavbarDropdown">
                   <Link to="/admin">Lista</Link>
                   {/* <Link href="/admin/jobs/create">Shto</Link> */}
@@ -47,7 +42,7 @@ export default function NavBar() {
                   <br></br>
                 </NavDropdown> */}
                 <NavDropdown title="Kategoritë" id="offcanvasNavbarDropdown">
-                  <Link to="/admin">Lista</Link>
+                  <Link to="/admin/categories">Lista</Link>
                   <br></br>
                   <Link to="/admin">Shto</Link>
                 </NavDropdown>

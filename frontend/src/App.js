@@ -25,26 +25,30 @@ function App() {
   const dispatch = useDispatch();
   let token = localStorage.getItem("token");
   useEffect(() => {
-    async function initializeToken() {
-      dispatch(initialState());
-      if (token) {
-        await axios
-          .get(`http://localhost:4500/api/user/current`, {
-            headers: {
-              token: token,
-            },
-          })
-          .then((res) => {
-            dispatch(login(res.data));
-            setLoading(false);
-          });
-      } else {
-        dispatch(logout());
-        setLoading(false);
-        console.log("no token");
+    try {
+      async function initializeToken() {
+        dispatch(initialState());
+        if (token) {
+          await axios
+            .get(`http://localhost:4500/api/user/current`, {
+              headers: {
+                token: token,
+              },
+            })
+            .then((res) => {
+              dispatch(login(res.data));
+              setLoading(false);
+            });
+        } else {
+          dispatch(logout());
+          setLoading(false);
+          console.log("no token");
+        }
       }
+      initializeToken();
+    } catch (error) {
+      console.log(error);
     }
-    initializeToken();
   }, [dispatch]);
 
   console.log(JSON.stringify(session) + isAuth);

@@ -1,6 +1,6 @@
 import NavBar from "../../../components/admin/navbar/NavBar";
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
 import { FaTrashAlt } from "react-icons/fa";
 import MuiAlert from "@mui/material/Alert";
@@ -31,16 +31,21 @@ const FilterComponent = ({ filterText, onFilter, onClear }) => {
   );
 };
 
-export async function getServerSideProps(context) {
-  const res = await axios.get(`${process.env.API_URL}/admin/categories`);
-  return {
-    props: {
-      categories: res.data,
-    },
-  };
-}
-
 export default function CategoriesIndex() {
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:4500/api/admin/categories`
+        );
+        console.log(res.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchData();
+  }, []);
+
   const session = useSelector((state) => state.user.user);
 
   const [openSuccess, setOpenSuccess] = React.useState(false);
@@ -55,20 +60,6 @@ export default function CategoriesIndex() {
       item.name && item.name.toLowerCase().includes(filterText.toLowerCase())
   );
 
-  // const columns = [
-  //   {
-  //     name: "Id",
-  //     selector: (row) => row.id,
-  //     sortable: true,
-  //   },
-  //   {
-  //     name: "Emri",
-  //     selector: (row) => row.name,
-  //     sortable: true,
-  //   },
-  // ];
-  // }
-  //  else if (session.role == 3) {
   const columns = [
     {
       name: "Id",
