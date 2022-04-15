@@ -9,24 +9,8 @@ import Swal from "sweetalert2";
 import CustomAlert from "../../../components/CustomAlert";
 // import axios_auth from ("../../../utils/axios/authenticated");
 import axios_auth from "../../../utils/axios/authenticated";
-const FilterComponent = ({ filterText, onFilter, onClear }) => {
-  return (
-    <div style={{ padding: "20px" }}>
-      <input
-        type="text"
-        className="form-control"
-        placeholder="Search..."
-        value={filterText}
-        onChange={onFilter}
-      />
-      {filterText && (
-        <button className="btn btn-link" onClick={onClear}>
-          Clear
-        </button>
-      )}
-    </div>
-  );
-};
+import { FilterComponent } from "../../../components/admin/FilterComponent";
+
 
 export default function CategoriesIndex() {
   const [openSuccess, setOpenSuccess] = React.useState(false);
@@ -39,7 +23,7 @@ export default function CategoriesIndex() {
     const fetchData = async () => {
       try {
         const res = await axios_auth.get(`/admin/categories`);
-        setData(res.data);
+        setData(res.data.categories);
         setLoading(false);
       } catch (error) {
         console.log(error);
@@ -114,11 +98,12 @@ export default function CategoriesIndex() {
               Swal.fire({
                 title: `Doni ta fshini kategorin ${row.name}?`,
                 text: "Fshirja nuk mund të kthehet mbrapsht!",
-                icon: "warning",
+                icon: "question",
                 showCancelButton: true,
                 confirmButtonColor: "#3085d6",
                 cancelButtonColor: "#d33",
                 confirmButtonText: "Fshije!",
+                cancelButtonText: "Anullo",
               }).then((result) => {
                 if (result.isConfirmed) {
                   axios_auth

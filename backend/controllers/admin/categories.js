@@ -49,7 +49,10 @@ const getAllCategories = async (req, res) => {
         },
       },
     });
-    return res.status(200).json(categories);
+    return res.status(200).json({
+      success: true,
+      categories,
+    });
   } catch (error) {
     return res.status(404).json({
       success: false,
@@ -126,6 +129,7 @@ const updateCategory = async (req, res) => {
       },
       data: {
         name,
+        updatedAt: new Date(),
       },
     });
 

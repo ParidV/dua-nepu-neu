@@ -34,8 +34,7 @@ export default function NavBar() {
                 </Link>
 
                 <NavDropdown title="Punët" id="offcanvasNavbarDropdown">
-                  <Link to="/admin">Lista</Link>
-                  {/* <Link href="/admin/jobs/create">Shto</Link> */}
+                  <Link to="/admin/jobs">Lista</Link>
                 </NavDropdown>
                 {/* <NavDropdown title="Punët" id="offcanvasNavbarDropdown">
                   <Link href="/admin/jobs">Lista</Link>
