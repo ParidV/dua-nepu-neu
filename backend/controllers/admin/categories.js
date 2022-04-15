@@ -101,6 +101,10 @@ const updateCategory = async (req, res) => {
         message: "No id provided",
       });
     }
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
 
     const category_check = await prisma.categories.findUnique({
       where: {

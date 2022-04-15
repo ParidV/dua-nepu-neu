@@ -92,10 +92,16 @@ export default function CategoriesIndex() {
       name: "actions",
       cell: (row) => (
         <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <FaEdit
-            color="blue"
-            style={{ cursor: "pointer", fontSize: "20px", marginRight: "20px" }}
-          />
+          <Link to={`/admin/categories/${row.id}`}>
+            <FaEdit
+              color="blue"
+              style={{
+                cursor: "pointer",
+                fontSize: "20px",
+                marginRight: "20px",
+              }}
+            />
+          </Link>
           <FaTrashAlt
             color="red"
             // size bigger
@@ -105,47 +111,48 @@ export default function CategoriesIndex() {
               marginRight: "10px",
             }}
             onClick={() => {
-              try {
-                Swal.fire({
-                  title: `Do you want to delete the selected category?`,
-                  text: "You won't be able to revert this!",
-                  icon: "warning",
-                  showCancelButton: true,
-                  confirmButtonColor: "#3085d6",
-                  cancelButtonColor: "#d33",
-                  confirmButtonText: "Yes, delete it!",
-                }).then((result) => {
-                  console.log(result);
-                  //   if (result.isConfirmed) {
-                  //     axios
-                  //       .delete(
-                  //         `${process.env.API_URL}/admin/categories/${row.id}`
-                  //       )
-                  //       .then((res) => {
-                  //         console.log(res.data.success);
-                  //         if (res.data.success) {
-                  //           const filteredData = data.filter(
-                  //             (item) => item.id !== row.id
-                  //           );
-                  //           setData(filteredData);
+              Swal.fire({
+                title: `Doni ta fshini kategorin ${row.name}?`,
+                text: "Fshirja nuk mund të kthehet mbrapsht!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Fshije!",
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  axios_auth
+                    .delete(`/admin/categories/${row.id}`)
+                    .then((res) => {
+                      console.log(res.data.success);
+                      if (res.data.success) {
+                        const filteredData = data.filter(
+                          (item) => item.id !== row.id
+                        );
+                        setData(filteredData);
 
-                  //           setOpenSuccess(true);
-                  //           setTimeout(() => {
-                  //             setOpenSuccess(false);
-                  //           }, 5000);
-                  //         }
-                  //       });
-                  //   }
-                });
-              } catch (error) {
-                console.log(error);
-              }
+                        setMessageSuccess("Kategoria u fshi me sukses!");
+                        setOpenSuccess(true);
+                        setTimeout(() => {
+                          setOpenSuccess(false);
+                          setMessageSuccess("");
+                        }, 5000);
+                      }
+                    })
+                    .catch((err) => {
+                      if (err.response.status !== 200) {
+                        setMessageError("Pati nje problem :(");
+                        setOpenError(true);
+                        setTimeout(() => {
+                          setMessageError("");
+                          setOpenError(false);
+                        }, 5000);
+                      }
+                    });
+                }
+              });
             }}
           />
-
-          {/* <Link to={`/admin/categories/${row.id}`} >
-
-          </Link> */}
         </div>
       ),
     },

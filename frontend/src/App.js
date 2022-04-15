@@ -16,7 +16,8 @@ import Unauthorised from "./pages/Unauthorised";
 import RequireAuth from "./components/RequireAuth";
 import AdminDashboard from "./pages/admin";
 import CategoriesIndex from "./pages/admin/categories";
-
+import EditCategory from "./pages/admin/categories/id";
+import NotFound from "./pages/NotFound";
 
 function App() {
   const session = useSelector((state) => state.user.user);
@@ -64,6 +65,7 @@ function App() {
       <Router>
         <Routes>
           <Route exact path="/" element={<Home />} />
+          <Route exact path="/404" element={<NotFound />} />
           <Route
             exact
             path="login"
@@ -77,6 +79,7 @@ function App() {
           >
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/categories" element={<CategoriesIndex />} />
+            <Route path="/admin/categories/:id" element={<EditCategory />} />
           </Route>
         </Routes>
       </Router>
