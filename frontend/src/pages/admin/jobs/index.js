@@ -1,7 +1,7 @@
 import NavBar from "../../../components/admin/navbar/NavBar";
 import React, { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
-import { FaTrashAlt, FaEdit } from "react-icons/fa";
+import { FaCheck, FaRegThumbsDown } from "react-icons/fa";
 import { FilterComponent } from "../../../components/admin/FilterComponent";
 import axios_auth from "../../../utils/axios/authenticated";
 import { Snackbar } from "@mui/material";
@@ -76,15 +76,32 @@ export default function JobsAdmin() {
       width: "150px",
     },
     {
-      name: "Type",
-      selector: (row) => row.type,
+      name: "Lloji",
+      selector: (row) =>
+        row.type === 1
+          ? "Fulltime"
+          : row.type === 2
+          ? "Part Time"
+          : row.type === 3
+          ? "Internship"
+          : row.type === 4
+          ? "Freelance"
+          : "",
       sortable: true,
     },
 
     {
-      name: "Vendi punes",
-      selector: (row) => row.place_of_work,
+      name: "Vendi punës",
+      selector: (row) =>
+        row.place_of_work === 1
+          ? "In presence (office)"
+          : row.place_of_work === 2
+          ? "Remote working (Home)"
+          : row.place_of_work === 3
+          ? "Hybrid (Office & Home)"
+          : "",
       sortable: true,
+      width: "150px",
     },
     {
       name: "Shteti",
@@ -103,13 +120,22 @@ export default function JobsAdmin() {
       width: "150px",
     },
     {
-      name: "actions",
+      name: "Aktive",
       cell: (row) => (
         <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <FaEdit
-            color="blue"
-            style={{ cursor: "pointer", fontSize: "20px" }}
-          />
+          {row.is_active &&
+          row.start_of_application >= new Date() &&
+          row.end_of_application >= new Date() ? (
+            <FaCheck
+              color="green"
+              style={{ cursor: "pointer", fontSize: "20px" }}
+            />
+          ) : (
+            <FaRegThumbsDown
+              color="red"
+              style={{ cursor: "pointer", fontSize: "20px" }}
+            />
+          )}
         </div>
       ),
     },
