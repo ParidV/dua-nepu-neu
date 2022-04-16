@@ -2,6 +2,7 @@ const { validationResult } = require("express-validator");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const jwt_decode = require("jwt-decode");
+const { formatInTimeZone, zonedTimeToUtc } = require("date-fns-tz");
 
 const storeCategories = async (req, res) => {
   try {
@@ -17,12 +18,24 @@ const storeCategories = async (req, res) => {
 
     const user_id = decoded_token.id;
 
+    const date = new Date();
+    const date_string = formatInTimeZone(
+      date,
+      "Europe/Rome",
+      "yyyy-MM-dd HH:mm:ss"
+    );
+    console.log(test_date_utc);
+    console.log(date_string); //2022-04-16 11:46:28  (Right time)
+    const current_date = new Date(date_string); // 2022-04-16T09:46:28.000Z
+
+    console.log(current_date);
+
     await prisma.categories.create({
       data: {
         name,
         userId: user_id,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: current_date,
+        updatedAt: current_date,
       },
     });
     return res

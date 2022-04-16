@@ -7,6 +7,7 @@ import axios_auth from "../../../utils/axios/authenticated";
 import { Snackbar } from "@mui/material";
 import CustomAlert from "../../../components/CustomAlert";
 import ExpandedComponentJob from "../../../components/admin/jobs/ExpandedComponent";
+import { formatInTimeZone } from "date-fns-tz";
 const { format } = require("date-fns");
 
 export default function JobsAdmin() {
@@ -39,6 +40,15 @@ export default function JobsAdmin() {
     };
     fetchData();
   }, []);
+
+  const date = new Date();
+  const date_string = formatInTimeZone(
+    date,
+    "Europe/Rome",
+    "yyyy-MM-dd HH:mm:ss"
+  );
+  const current_date = new Date(date_string);
+  console.log(current_date + " Y ");
 
   const [resetPaginationToggle, setResetPaginationToggle] =
     React.useState(false);
@@ -124,17 +134,19 @@ export default function JobsAdmin() {
       cell: (row) => (
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           {row.is_active &&
-          row.start_of_application >= new Date() &&
-          row.end_of_application >= new Date() ? (
+          new Date(row.start_of_application) <= new Date() &&
+          new Date(row.end_of_application) >= new Date() ? (
             <FaCheck
               color="green"
               style={{ cursor: "pointer", fontSize: "20px" }}
             />
           ) : (
-            <FaRegThumbsDown
-              color="red"
-              style={{ cursor: "pointer", fontSize: "20px" }}
-            />
+            <>
+              <FaRegThumbsDown
+                color="red"
+                style={{ cursor: "pointer", fontSize: "20px" }}
+              />
+            </>
           )}
         </div>
       ),
@@ -157,8 +169,7 @@ export default function JobsAdmin() {
       />
     );
   }, [filterText, resetPaginationToggle]);
-  const date = new Date();
-  console.log(`${format(date, "dd.MM.yyyy")}`);
+
   return (
     <>
       <Snackbar open={loading}>
