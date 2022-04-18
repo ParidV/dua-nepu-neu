@@ -47,6 +47,7 @@ function AdminSettings() {
 
   const formik = useFormik({
     enableReinitialize: true,
+    validateOnChange: false,
     initialValues: {
       name: data.name,
       surname: data.surname,
@@ -70,30 +71,31 @@ function AdminSettings() {
       email: yup
         .string("Duhet string")
         .required("Email është i detyruar")
-        .email("Email nuk është i saktë"),
-      // .when("checkEmail", {
-      //   is: true,
-      //   then: yup.string().test({
-      //     message: () => "Email already exists",
-      //     test: async (values) => {
-      //       if (values) {
-      //         try {
-      //           let response = await axios_auth(
-      //             `user/email_check/${formik.values.email}`
-      //           );
-
-      //           if (response.success) {
-      //             return true;
-      //           } else {
-      //             return false;
-      //           }
-      //         } catch (error) {
-      //           console.log(error);
-      //         }
-      //       }
-      //     },
-      //   }),
-      // }),
+        .email("Email nuk është i saktë")
+        .test(
+          "Unique Email",
+          "Email është në përdorim nga dikush tjetër", // <- key, message
+          function (value) {
+            return new Promise((resolve, reject) => {
+              axios_auth
+                .get(`user/email_check/${formik.values.email}`)
+                .then((res) => {
+                  if (res.data.success) {
+                    resolve(true);
+                  } else {
+                    resolve(false);
+                  }
+                })
+                .catch((error) => {
+                  setTimeout(() => {
+                    setMessageError("Pati Nje problem :(");
+                    setOpenError(true);
+                  }, 3000);
+                  setMessageError("");
+                });
+            });
+          }
+        ),
       phone: yup
         .string("Duhet string")
         .required("Numri i telefonit është i detyruar")
@@ -112,7 +114,6 @@ function AdminSettings() {
       zip: yup.number("Duhet numër").nullable(),
     }),
     onSubmit: (values) => {
-      console.log(values);
       axios_auth
         .put(`/admin/settings/update_data`, values)
         .then((res) => {
@@ -178,7 +179,7 @@ function AdminSettings() {
               <Grid item xs={12} sm={4} md={4}>
                 <TextField
                   fullWidth
-                  label="Emri"
+                  label="Name"
                   name="name"
                   variant="outlined"
                   value={formik.values.name}
