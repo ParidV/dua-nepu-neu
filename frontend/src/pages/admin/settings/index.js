@@ -288,7 +288,14 @@ function AdminSettings() {
                       fullWidth
                       name="dob"
                       onChange={(val) => {
-                        formik.setFieldValue("dob", val);
+                        if (val) {
+                          formik.setFieldValue(
+                            "dob",
+                            format(val, "yyyy-MM-dd")
+                          );
+                        } else {
+                          formik.setFieldValue("dob", "");
+                        }
                       }}
                       renderInput={(params) => <TextField {...params} />}
                       onBlur={formik.handleBlur}

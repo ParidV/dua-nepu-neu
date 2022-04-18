@@ -41,6 +41,5 @@ exports.updateAdminDataValidation = () => {
       .if((value) => value !== null)
       .isNumeric()
       .withMessage("Please enter a valid number!"),
-    body("dob").isDate().withMessage("Please enter a valid date!"),
   ];
 };

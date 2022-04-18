@@ -44,7 +44,7 @@ const updateAdminData = async (req, res) => {
         city,
         address,
         zip,
-        dob,
+        dob: new Date(dob),
       },
     });
 
