@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const { admin_auth } = require("../../../utils/auth");
 
-const { createCategories } = require("../../../validations/categories");
+const { createCategories } = require("../../../validations/admin/categories");
 const {
   storeCategories,
   getAllCategories,

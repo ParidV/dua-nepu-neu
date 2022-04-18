@@ -7,7 +7,6 @@ import { Link } from "react-router-dom";
 import Snackbar from "@mui/material/Snackbar";
 import Swal from "sweetalert2";
 import CustomAlert from "../../../components/CustomAlert";
-// import axios_auth from ("../../../utils/axios/authenticated");
 import axios_auth from "../../../utils/axios/authenticated";
 import { FilterComponent } from "../../../components/admin/FilterComponent";
 

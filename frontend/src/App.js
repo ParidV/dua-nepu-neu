@@ -19,6 +19,8 @@ import CategoriesIndex from "./pages/admin/categories";
 import EditCategory from "./pages/admin/categories/id";
 import NotFound from "./pages/NotFound";
 import JobsAdmin from "./pages/admin/jobs";
+import CreateCategory from "./pages/admin/categories/create";
+import AdminSettings from "./pages/admin/settings/index";
 
 function App() {
   const session = useSelector((state) => state.user.user);
@@ -79,9 +81,14 @@ function App() {
             }
           >
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route
+              path="/admin/categories/create"
+              element={<CreateCategory />}
+            />
             <Route path="/admin/categories" element={<CategoriesIndex />} />
             <Route path="/admin/categories/:id" element={<EditCategory />} />
             <Route path="/admin/jobs" element={<JobsAdmin />} />
+            <Route path="/admin/settings" element={<AdminSettings />} />
           </Route>
         </Routes>
       </Router>
