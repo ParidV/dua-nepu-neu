@@ -4,11 +4,7 @@ const jwt = require("jsonwebtoken");
 const router = require("express").Router();
 const bcrypt = require("bcrypt");
 const { validationResult } = require("express-validator");
-const {
-  generateAccessToken,
-  generateRefreshToken,
-  authenticated,
-} = require("../utils/auth");
+const { generateAccessToken, generateRefreshToken } = require("../utils/auth");
 
 const { emailExistCheck } = require("../validations/checks");
 
@@ -130,7 +126,14 @@ router.get("/user/current_user_data", (req, res) => {
       .json({ success: false, message: "Access denied. No token provided." });
 
   jwt.verify(token, "mySecretKey", async (err, user_data) => {
-    if (err) return res.status(500).json("Invalid token.", err);
+    if (err)
+      return res.status(500).json(
+        {
+          success: false,
+          message: "Invalid token.",
+        },
+        err
+      );
     const user = await prisma.users.findUnique({
       where: {
         id: Number(user_data.id),

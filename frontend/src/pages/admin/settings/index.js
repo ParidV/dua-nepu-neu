@@ -16,6 +16,8 @@ import { FormHelperText } from "@mui/material";
 import axios_auth from "../../../utils/axios/authenticated";
 import CustomAlert from "../../../components/CustomAlert";
 import { format } from "date-fns";
+import { useDispatch } from "react-redux";
+import { login, update_data } from "../../../redux/user/userSlice";
 function AdminSettings() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,6 +25,7 @@ function AdminSettings() {
   const [openError, setOpenError] = React.useState(false);
   const [messageError, setMessageError] = React.useState("");
   const [messageSuccess, setMessageSuccess] = React.useState("");
+  const dispatch = useDispatch();
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -114,18 +117,41 @@ function AdminSettings() {
       zip: yup.number("Duhet numër").nullable(),
     }),
     onSubmit: (values) => {
+      setLoading(true);
       axios_auth
         .put(`/admin/settings/update_data`, values)
         .then((res) => {
           if (res.data.success && res.status === 200) {
-            setOpenSuccess(true);
-            setMessageSuccess("Të dhënat u ruajtën me sukses");
-            setTimeout(() => {
-              setOpenSuccess(false);
-            }, 5000);
+            axios_auth
+              .post(`/admin/settings/generate_new_token`)
+              .then((res) => {
+                console.log(res);
+                if (res.data.success && res.status === 200) {
+                  localStorage.removeItem("token");
+                  localStorage.setItem("token", res.data.new_token);
+                  dispatch(update_data(res.data.user));
+                  setTimeout(() => {
+                    setLoading(false);
+                    setMessageSuccess("Të dhënat u ndryshuan me sukses");
+                    setOpenSuccess(true);
+                  }, 3000);
+                  setMessageSuccess("");
+                  setOpenSuccess(false);
+                }
+              })
+              .catch((error) => {
+                setLoading(false);
+                setTimeout(() => {
+                  setMessageError("Pati Nje problem :(");
+                  setOpenError(true);
+                }, 3000);
+                setMessageError("");
+                setOpenError(false);
+              });
           } else {
+            setLoading(false);
             setOpenError(true);
-            setMessageError("Pati nje problem 111");
+            setMessageError("Pati nje problem ");
             setTimeout(() => {
               setOpenError(false);
               setMessageError("");
@@ -133,6 +159,7 @@ function AdminSettings() {
           }
         })
         .catch((err) => {
+          setLoading(false);
           console.log(err + " MSG ");
           setOpenError(true);
           setMessageError("Pati nje problem");
@@ -182,6 +209,9 @@ function AdminSettings() {
                   label="Name"
                   name="name"
                   variant="outlined"
+                  inputLabelProps={{
+                    shrink: true,
+                  }}
                   value={formik.values.name}
                   onChange={formik.handleChange}
                   error={formik.touched.name && Boolean(formik.errors.name)}
