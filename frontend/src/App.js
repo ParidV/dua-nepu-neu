@@ -21,6 +21,7 @@ import NotFound from "./pages/NotFound";
 import JobsAdmin from "./pages/admin/jobs";
 import CreateCategory from "./pages/admin/categories/create";
 import AdminSettings from "./pages/admin/settings/index";
+import CompanyDashboard from "./pages/company";
 
 function App() {
   const session = useSelector((state) => state.user.user);
@@ -75,6 +76,7 @@ function App() {
             element={session ? <Navigate to="/" replace /> : <Login />}
           />
           <Route exact path="unauthorised" element={<Unauthorised />} />
+          {/* ADMIN */}
           <Route
             element={
               <RequireAuth allowedRoles={3} session_role={session?.role} />
@@ -89,6 +91,14 @@ function App() {
             <Route path="/admin/categories/:id" element={<EditCategory />} />
             <Route path="/admin/jobs" element={<JobsAdmin />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
+          </Route>
+          {/* Company */}
+          <Route
+            element={
+              <RequireAuth allowedRoles={2} session_role={session?.role} />
+            }
+          >
+            <Route path="/company" element={<CompanyDashboard />} />
           </Route>
         </Routes>
       </Router>
