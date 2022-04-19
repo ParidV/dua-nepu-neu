@@ -14,6 +14,8 @@ router.post("/login", async (req, res) => {
 
     if (!email || !password) {
       return res.status(400).json({
+        success: false,
+        status: 1000,
         error: "username and password are required",
       });
     }
@@ -24,11 +26,19 @@ router.post("/login", async (req, res) => {
       },
     });
     if (!user) {
-      return res.status(400).json({ message: "User not found" });
+      return res.status(400).json({
+        success: false,
+        status: 1001,
+        message: "User not found"
+      });
     } else {
       const validPassword = await bcrypt.compare(password, user.password);
       if (!validPassword) {
-        return res.status(400).json({ error: "Password not valid" });
+        return res.status(400).json({
+          success: false,
+          status: 1002,
+          error: "Password not valid"
+        });
       }
     }
 
