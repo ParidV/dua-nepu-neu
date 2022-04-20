@@ -22,6 +22,7 @@ import JobsAdmin from "./pages/admin/jobs";
 import CreateCategory from "./pages/admin/categories/create";
 import AdminSettings from "./pages/admin/settings/index";
 import CompanyDashboard from "./pages/company";
+import CompanyJobsIndex from "./pages/company/jobs/index";
 
 function App() {
   const session = useSelector((state) => state.user.user);
@@ -99,6 +100,7 @@ function App() {
             }
           >
             <Route path="/company" element={<CompanyDashboard />} />
+            <Route path="/company/jobs" element={<CompanyJobsIndex />} />
           </Route>
         </Routes>
       </Router>
