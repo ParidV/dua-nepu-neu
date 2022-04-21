@@ -90,7 +90,7 @@ const validateOldTokenAndGeneratingNewToken = async (req, res) => {
       });
     }
 
-    jwt.verify(token, "mySecretKey", async (err, user) => {
+    jwt.verify(token, process.env.SECRET_KEY, async (err, user) => {
       if (err) {
         return res.status(403).json({
           message: "Access denied",

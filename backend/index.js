@@ -14,8 +14,8 @@ app.use(helmet());
 app.use(morgan("common"));
 app.use(cors());
 
-app.listen({ port: 4500 }, () => {
-  console.log(`Server running on port http://localhost:4500`);
+app.listen({ port: process.env.PORT }, () => {
+  console.log(`Server running on port http://localhost:${process.env.PORT}`);
 });
 
 app.use("/api", authRoute);

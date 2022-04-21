@@ -9,7 +9,7 @@ const generateAccessToken = (user) => {
       email: user.email,
       role: user.role,
     },
-    "mySecretKey",
+    process.env.SECRET_KEY,
     {
       expiresIn: "10d",
     }
@@ -33,14 +33,14 @@ const generateRefreshToken = (user) => {
       dob: user.dob,
       cv: user.cv,
     },
-    "myRefreshSecretKey"
+    process.env.REFRESH_SECRET_KEY
   );
 };
 
 const authenticated = (req, res, next) => {
   const token = req.headers["token"];
   if (token) {
-    jwt.verify(token, "mySecretKey", (err, user) => {
+    jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
       if (err) {
         return res.status(403).json({
           message: "Access denied",
@@ -63,7 +63,7 @@ const authenticated = (req, res, next) => {
 const user_auth = (req, res, next) => {
   const token = req.headers["token"];
   if (token) {
-    jwt.verify(token, "mySecretKey", (err, user) => {
+    jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
       if (err) {
         return res.status(403).json({
           message: "Access denied",
@@ -90,7 +90,7 @@ const user_auth = (req, res, next) => {
 const company_auth = (req, res, next) => {
   const token = req.headers["token"];
   if (token) {
-    jwt.verify(token, "mySecretKey", (err, user) => {
+    jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
       if (err) {
         return res.status(403).json({
           message: "Access denied",
@@ -117,7 +117,7 @@ const company_auth = (req, res, next) => {
 const admin_auth = (req, res, next) => {
   const token = req.headers["token"];
   if (token) {
-    jwt.verify(token, "mySecretKey", (err, user) => {
+    jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
       if (err) {
         return res.status(403).json({
           message: "Access denied",

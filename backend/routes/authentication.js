@@ -29,7 +29,7 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({
         success: false,
         status: 1001,
-        message: "User not found"
+        message: "User not found",
       });
     } else {
       const validPassword = await bcrypt.compare(password, user.password);
@@ -37,7 +37,7 @@ router.post("/login", async (req, res) => {
         return res.status(400).json({
           success: false,
           status: 1002,
-          error: "Password not valid"
+          error: "Password not valid",
         });
       }
     }
@@ -87,29 +87,33 @@ router.post("/refresh", async (req, res) => {
 
   if (!refresh_token_db)
     return res.status(401).json("You are not authenticated!");
-  jwt.verify(refreshToken, "myRefreshSecretKey", async (err, user) => {
-    err && console.log(err);
-    const refresh_token_id = refresh_token_db.id;
-    await prisma.refreshTokens.delete({
-      where: {
-        id: refresh_token_id,
-      },
-    });
+  jwt.verify(
+    refreshToken,
+    process.env.REFRESH_SECRET_KEY,
+    async (err, user) => {
+      err && console.log(err);
+      const refresh_token_id = refresh_token_db.id;
+      await prisma.refreshTokens.delete({
+        where: {
+          id: refresh_token_id,
+        },
+      });
 
-    const newAccessToken = generateAccessToken(user);
-    const newRefreshToken = generateRefreshToken(user);
+      const newAccessToken = generateAccessToken(user);
+      const newRefreshToken = generateRefreshToken(user);
 
-    await prisma.refreshTokens.create({
-      data: {
-        token: newRefreshToken,
-      },
-    });
+      await prisma.refreshTokens.create({
+        data: {
+          token: newRefreshToken,
+        },
+      });
 
-    res.status(200).json({
-      accessToken: newAccessToken,
-      refreshToken: newRefreshToken,
-    });
-  });
+      res.status(200).json({
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+      });
+    }
+  );
 });
 
 router.get("/user/current", (req, res) => {
@@ -121,8 +125,15 @@ router.get("/user/current", (req, res) => {
       .status(401)
       .json({ success: false, message: "Access denied. No token provided." });
 
-  jwt.verify(token, "mySecretKey", (err, user) => {
-    if (err) return res.status(500).json("Invalid token.", err);
+  jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
+    if (err)
+      return res.status(500).json(
+        {
+          message: "Invalid token.",
+          success: false,
+        },
+        err
+      );
     res.status(200).json(user);
   });
 });
@@ -135,7 +146,7 @@ router.get("/user/current_user_data", (req, res) => {
       .status(401)
       .json({ success: false, message: "Access denied. No token provided." });
 
-  jwt.verify(token, "mySecretKey", async (err, user_data) => {
+  jwt.verify(token, process.env.SECRET_KEY, async (err, user_data) => {
     if (err)
       return res.status(500).json(
         {
@@ -191,7 +202,7 @@ router.get("/user/email_check/:email", async (req, res) => {
       .status(401)
       .json({ success: false, message: "Access denied. No token provided." });
 
-  jwt.verify(token, "mySecretKey", async (err, user_data) => {
+  jwt.verify(token, process.env.SECRET_KEY, async (err, user_data) => {
     user_id = user_data.id;
     if (err) return res.status(500).json("Invalid token.", err);
     try {
