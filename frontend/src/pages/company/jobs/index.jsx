@@ -1,15 +1,14 @@
-import NavBar from "../../../components/company/Navbar/index";
-import axios from "axios";
+import NavBar from "../../../components/company/Navbar/Navbar";
+import axios_auth from "../../../utils/axios/authenticated";
 import React, { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
 import { FaTrashAlt, FaEdit } from "react-icons/fa";
 import MuiAlert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
 import Swal from "sweetalert2";
+import CustomAlert from "../../../components/CustomAlert";
 const { format } = require("date-fns");
-const Alert = React.forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
+
 const FilterComponent = ({ filterText, onFilter, onClear }) => {
   return (
     <div style={{ padding: "20px" }}>
@@ -30,10 +29,33 @@ const FilterComponent = ({ filterText, onFilter, onClear }) => {
 };
 
 export default function CompanyJobsIndex() {
-  // TODO : get all jobs from the database
-  const [data, setData] = useState([]);
   const [openSuccess, setOpenSuccess] = React.useState(false);
   const [openError, setOpenError] = React.useState(false);
+  const [messageError, setMessageError] = React.useState("");
+  const [messageSuccess, setMessageSuccess] = React.useState("");
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await axios_auth.get(`/company/jobs`);
+        setData(res.data.jobs);
+        setLoading(false);
+      } catch (error) {
+        console.log(error);
+        setData([]);
+
+        setTimeout(() => {
+          setMessageError("Pati Nje problem :(");
+          setOpenError(true);
+        }, 3000);
+        setMessageError("");
+        setOpenError(false);
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   const [filterText, setFilterText] = React.useState("");
   const [resetPaginationToggle, setResetPaginationToggle] =
@@ -82,11 +104,11 @@ export default function CompanyJobsIndex() {
     {
       name: "Vendi punes",
       selector: (row) =>
-        row.place_of_work == 1
+        row.place_of_work === 1
           ? "Office"
-          : row.place_of_work == 2
+          : row.place_of_work === 2
           ? "Remote"
-          : row.place_of_work == 3
+          : row.place_of_work === 3
           ? "Hybrid"
           : "",
       sortable: true,
@@ -195,21 +217,24 @@ export default function CompanyJobsIndex() {
       />
     );
   }, [filterText, resetPaginationToggle]);
-  const date = new Date();
-  console.log(`${format(date, "dd.MM.yyyy")}`);
   return (
     <>
       <NavBar />
+      <Snackbar open={loading}>
+        <CustomAlert severity="info" sx={{ width: "100%" }}>
+          Loading
+        </CustomAlert>
+      </Snackbar>
       <Snackbar open={openSuccess} autoHideDuration={200}>
-        <Alert severity="success" sx={{ width: "100%" }}>
-          Kategoria u fshi me sukses
-        </Alert>
+        <CustomAlert severity="success" sx={{ width: "100%" }}>
+          {messageSuccess}
+        </CustomAlert>
       </Snackbar>
 
       <Snackbar open={openError} autoHideDuration={200}>
-        <Alert severity="error" sx={{ width: "100%" }}>
-          Kategoria nuk u fshi!
-        </Alert>
+        <CustomAlert severity="error" sx={{ width: "100%" }}>
+          {messageError}
+        </CustomAlert>
       </Snackbar>
       <DataTable
         title="Punët"

@@ -1,21 +1,7 @@
 const { body } = require("express-validator");
 exports.createJob = () => {
   return [
-    body("userId")
-      .not()
-      .isEmpty()
-      .withMessage("User Id is required")
-      //TODO : check if userId is valid
-      .custom((value, { req }) => {
-        return new Promise((resolve, reject) => {
-          const { userId } = req.body;
-          if (userId) {
-            resolve(true);
-          } else {
-            reject(new Error("User Id is required"));
-          }
-        });
-      }),
+    body("userId").not().isEmpty().withMessage("User Id is required"),
     body("categoryId").not().isEmpty().withMessage("categoryId Id is required"),
     body("title")
       .isString()

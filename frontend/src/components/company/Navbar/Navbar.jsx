@@ -28,7 +28,7 @@ function NavBar() {
                 <CLink to="/company/jobs/">Lista</CLink>
               </NavDropdown.Item>
               <NavDropdown.Item>
-                <CLink to="/company/jobs/create">Create Job</CLink>
+                <CLink to="/company/jobs/create">Krijo Punë</CLink>
               </NavDropdown.Item>
             </NavDropdown>{" "}
             <NavDropdown title="Applications" id="navbarScrollingDropdown">
