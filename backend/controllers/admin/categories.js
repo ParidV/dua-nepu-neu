@@ -2,6 +2,7 @@ const { validationResult } = require("express-validator");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const jwt_decode = require("jwt-decode");
+const { formatInTimeZone } = require("date-fns-tz");
 
 const storeCategories = async (req, res) => {
   try {
@@ -17,12 +18,21 @@ const storeCategories = async (req, res) => {
 
     const user_id = decoded_token.id;
 
+    const date = new Date();
+    const date_string = formatInTimeZone(
+      date,
+      "Europe/Rome",
+      "yyyy-MM-dd HH:mm:ss"
+    );
+    const current_date = new Date(date_string); // 2022-04-16T09:46:28.000Z
+
+
     await prisma.categories.create({
       data: {
         name,
         userId: user_id,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: current_date,
+        updatedAt: current_date,
       },
     });
     return res
@@ -37,8 +47,22 @@ const storeCategories = async (req, res) => {
 };
 const getAllCategories = async (req, res) => {
   try {
-    const categories = await prisma.categories.findMany();
-    return res.status(200).json(categories);
+    const categories = await prisma.categories.findMany({
+      include: {
+        User: {
+          select: {
+            id: true,
+            name: true,
+            surname: true,
+            email: true,
+          },
+        },
+      },
+    });
+    return res.status(200).json({
+      success: true,
+      categories,
+    });
   } catch (error) {
     return res.status(404).json({
       success: false,
@@ -90,6 +114,10 @@ const updateCategory = async (req, res) => {
         message: "No id provided",
       });
     }
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
 
     const category_check = await prisma.categories.findUnique({
       where: {
@@ -111,6 +139,7 @@ const updateCategory = async (req, res) => {
       },
       data: {
         name,
+        updatedAt: new Date(),
       },
     });
 

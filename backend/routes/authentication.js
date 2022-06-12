@@ -3,12 +3,10 @@ const prisma = new PrismaClient();
 const jwt = require("jsonwebtoken");
 const router = require("express").Router();
 const bcrypt = require("bcrypt");
-const {
-  generateAccessToken,
-  generateRefreshToken,
-  authenticated,
-} = require("../utils/auth");
-const req = require("express/lib/request");
+const { validationResult } = require("express-validator");
+const { generateAccessToken, generateRefreshToken } = require("../utils/auth");
+
+const { emailExistCheck } = require("../validations/checks");
 
 router.post("/login", async (req, res) => {
   try {
@@ -16,6 +14,8 @@ router.post("/login", async (req, res) => {
 
     if (!email || !password) {
       return res.status(400).json({
+        success: false,
+        status: 1000,
         error: "username and password are required",
       });
     }
@@ -26,11 +26,19 @@ router.post("/login", async (req, res) => {
       },
     });
     if (!user) {
-      return res.status(400).json({ message: "User not found" });
+      return res.status(400).json({
+        success: false,
+        status: 1001,
+        message: "User not found",
+      });
     } else {
       const validPassword = await bcrypt.compare(password, user.password);
       if (!validPassword) {
-        return res.status(400).json({ error: "Password not valid" });
+        return res.status(400).json({
+          success: false,
+          status: 1002,
+          error: "Password not valid",
+        });
       }
     }
 
@@ -79,45 +87,148 @@ router.post("/refresh", async (req, res) => {
 
   if (!refresh_token_db)
     return res.status(401).json("You are not authenticated!");
-  jwt.verify(refreshToken, "myRefreshSecretKey", async (err, user) => {
-    err && console.log(err);
-    const refresh_token_id = refresh_token_db.id;
-    await prisma.refreshTokens.delete({
-      where: {
-        id: refresh_token_id,
-      },
-    });
+  jwt.verify(
+    refreshToken,
+    process.env.REFRESH_SECRET_KEY,
+    async (err, user) => {
+      err && console.log(err);
+      const refresh_token_id = refresh_token_db.id;
+      await prisma.refreshTokens.delete({
+        where: {
+          id: refresh_token_id,
+        },
+      });
 
-    const newAccessToken = generateAccessToken(user);
-    const newRefreshToken = generateRefreshToken(user);
+      const newAccessToken = generateAccessToken(user);
+      const newRefreshToken = generateRefreshToken(user);
 
-    await prisma.refreshTokens.create({
-      data: {
-        token: newRefreshToken,
-      },
-    });
+      await prisma.refreshTokens.create({
+        data: {
+          token: newRefreshToken,
+        },
+      });
 
-    res.status(200).json({
-      accessToken: newAccessToken,
-      refreshToken: newRefreshToken,
-    });
-  });
+      res.status(200).json({
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+      });
+    }
+  );
 });
 
 router.get("/user/current", (req, res) => {
   // get token and send user info
   const token = req.headers["token"];
   console.log(token);
-  if (!token) return res.status(401).json("Access denied. No token provided.");
+  if (!token)
+    return res
+      .status(401)
+      .json({ success: false, message: "Access denied. No token provided." });
 
-  jwt.verify(token, "mySecretKey", (err, user) => {
-    if (err) return res.status(500).json("Invalid token.", err);
+  jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
+    if (err)
+      return res.status(500).json(
+        {
+          message: "Invalid token.",
+          success: false,
+        },
+        err
+      );
     res.status(200).json(user);
   });
 });
+router.get("/user/current_user_data", (req, res) => {
+  // get token and send user info
+  const token = req.headers["token"];
+  console.log(token);
+  if (!token)
+    return res
+      .status(401)
+      .json({ success: false, message: "Access denied. No token provided." });
 
-router.get("/test", authenticated, (req, res) => {
-  res.json("Test");
+  jwt.verify(token, process.env.SECRET_KEY, async (err, user_data) => {
+    if (err)
+      return res.status(500).json(
+        {
+          success: false,
+          message: "Invalid token.",
+        },
+        err
+      );
+    const user = await prisma.users.findUnique({
+      where: {
+        id: Number(user_data.id),
+      },
+      select: {
+        id: true,
+        name: true,
+        surname: true,
+        email: true,
+        role: true,
+        avatar: true,
+        phone: true,
+        address: true,
+        country: true,
+        city: true,
+        zip: true,
+        number_of_employers: true,
+        dob: true,
+        description: true,
+        cv: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+    res.status(200).json({ success: true, user });
+  });
+});
+
+router.get("/user/email_check/:email", async (req, res) => {
+  const { email } = req.params;
+  if (!email) {
+    return res.status(400).json({
+      success: false,
+      message: "No id provided",
+    });
+  }
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+  const token = req.headers["token"];
+  console.log(token);
+  if (!token)
+    return res
+      .status(401)
+      .json({ success: false, message: "Access denied. No token provided." });
+
+  jwt.verify(token, process.env.SECRET_KEY, async (err, user_data) => {
+    user_id = user_data.id;
+    if (err) return res.status(500).json("Invalid token.", err);
+    try {
+      const user = await prisma.users.findMany({
+        where: {
+          id: {
+            not: user_id,
+          },
+          email,
+        },
+      });
+      if (user.length > 0) {
+        return res.status(200).json({
+          success: false,
+          message: "Email already exists",
+        });
+      } else {
+        return res.status(200).json({
+          success: true,
+          message: "Email is available",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  });
 });
 
 module.exports = router;

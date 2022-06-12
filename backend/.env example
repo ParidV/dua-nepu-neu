@@ -3,3 +3,4 @@ DATABASE_URL="mysql://root:@localhost:3306/dua_nepu_backend"
 API_URL="http://localhost:4500/api"
 SECRET_KEY=""
 REFRESH_SECRET_KEY=""
+PORT = 4500

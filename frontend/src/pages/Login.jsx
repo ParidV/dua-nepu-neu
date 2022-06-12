@@ -11,7 +11,6 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Alert from "@mui/material/Alert";
-import Stack from "@mui/material/Stack";
 import Snackbar from "@mui/material/Snackbar";
 import { useFormik } from "formik";
 import * as yup from "yup";
@@ -31,7 +30,7 @@ const validationSchema = yup.object({
 });
 
 const loginLogic = (values) => {
-  return axios.post("http://localhost:4500/api/login", values);
+  return axios.post(`${process.env.REACT_APP_API_URL}/login`, values);
 };
 
 export default function Login() {
@@ -61,16 +60,19 @@ export default function Login() {
           console.log(res.data);
         })
         .catch((err) => {
-          if (!err?.response) {
-            setOpenErrorMessage("No Server Response");
-          } else if (err.response?.status === 400) {
-            setOpenErrorMessage("Missing Username or Password");
-          } else if (err.response?.status === 401) {
-            setOpenErrorMessage("Unauthorized");
+          if (err.response.data.status === 1001) {
+            setOpenErrorMessage("Të dhënat nuk janë të sakta");
+          } else if (err.response.data.status === 1002) {
+            setOpenErrorMessage("Email ose Fjalëkalimi nuk janë të sakta");
           } else {
-            setOpenErrorMessage("Login Failed");
+            setOpenErrorMessage("Diçka nuk shkoi siç duhet :(");
           }
+
           setOpenError(true);
+          setTimeout(() => {
+            setOpenError(false);
+            setOpenErrorMessage("");
+          }, 5000);
         });
     },
   });

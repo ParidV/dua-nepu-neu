@@ -16,6 +16,14 @@ import Unauthorised from "./pages/Unauthorised";
 import RequireAuth from "./components/RequireAuth";
 import AdminDashboard from "./pages/admin";
 import CategoriesIndex from "./pages/admin/categories";
+import EditCategory from "./pages/admin/categories/id";
+import NotFound from "./pages/NotFound";
+import JobsAdmin from "./pages/admin/jobs";
+import CreateCategory from "./pages/admin/categories/create";
+import AdminSettings from "./pages/admin/settings/index";
+import CompanyDashboard from "./pages/company";
+import CompanyJobsIndex from "./pages/company/jobs/index";
+import CreateJob from "./pages/company/jobs/create";
 
 function App() {
   const session = useSelector((state) => state.user.user);
@@ -25,26 +33,30 @@ function App() {
   const dispatch = useDispatch();
   let token = localStorage.getItem("token");
   useEffect(() => {
-    async function initializeToken() {
-      dispatch(initialState());
-      if (token) {
-        await axios
-          .get(`http://localhost:4500/api/user/current`, {
-            headers: {
-              token: token,
-            },
-          })
-          .then((res) => {
-            dispatch(login(res.data));
-            setLoading(false);
-          });
-      } else {
-        dispatch(logout());
-        setLoading(false);
-        console.log("no token");
+    try {
+      async function initializeToken() {
+        dispatch(initialState());
+        if (token) {
+          await axios
+            .get(`${process.env.REACT_APP_API_URL}/user/current`, {
+              headers: {
+                token: token,
+              },
+            })
+            .then((res) => {
+              dispatch(login(res.data));
+              setLoading(false);
+            });
+        } else {
+          dispatch(logout());
+          setLoading(false);
+          console.log("no token");
+        }
       }
+      initializeToken();
+    } catch (error) {
+      console.log(error);
     }
-    initializeToken();
   }, [dispatch]);
 
   console.log(JSON.stringify(session) + isAuth);
@@ -59,19 +71,38 @@ function App() {
       <Router>
         <Routes>
           <Route exact path="/" element={<Home />} />
+          <Route exact path="/404" element={<NotFound />} />
           <Route
             exact
             path="login"
             element={session ? <Navigate to="/" replace /> : <Login />}
           />
           <Route exact path="unauthorised" element={<Unauthorised />} />
+          {/* ADMIN */}
           <Route
             element={
               <RequireAuth allowedRoles={3} session_role={session?.role} />
             }
           >
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route
+              path="/admin/categories/create"
+              element={<CreateCategory />}
+            />
             <Route path="/admin/categories" element={<CategoriesIndex />} />
+            <Route path="/admin/categories/:id" element={<EditCategory />} />
+            <Route path="/admin/jobs" element={<JobsAdmin />} />
+            <Route path="/admin/settings" element={<AdminSettings />} />
+          </Route>
+          {/* Company */}
+          <Route
+            element={
+              <RequireAuth allowedRoles={2} session_role={session?.role} />
+            }
+          >
+            <Route path="/company" element={<CompanyDashboard />} />
+            <Route path="/company/jobs" element={<CompanyJobsIndex />} />
+            <Route path="/company/jobs/create" element={<CreateJob />} />
           </Route>
         </Routes>
       </Router>

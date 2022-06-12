@@ -29,29 +29,60 @@ export default function NavBar() {
             </Offcanvas.Header>
             <Offcanvas.Body>
               <Nav className="justify-content-end flex-grow-1 pe-3">
-                {/* <Nav.Link href="http://localhost:3000/admin/">
-                  Faqja Kryesore
-                </Nav.Link> */}
-                <Link to="/admin" id="offcanvasNavbarDropdown">
+                <Link
+                  to="/admin"
+                  id="offcanvasNavbarDropdown"
+                  style={{
+                    textDecoration: "none",
+                  }}
+                >
                   Faqja Kryesore
                 </Link>
-                {/* <Link href="/admin/jobs" id="offcanvasNavbarDropdown">
-                  <a>Punët</a>
-                </Link> */}
+                <br></br>
                 <NavDropdown title="Punët" id="offcanvasNavbarDropdown">
-                  <Link to="/admin">Lista</Link>
-                  {/* <Link href="/admin/jobs/create">Shto</Link> */}
+                  <Link
+                    to="/admin/jobs"
+                    style={{
+                      textDecoration: "none",
+                    }}
+                  >
+                    Lista
+                  </Link>
                 </NavDropdown>
-                {/* <NavDropdown title="Punët" id="offcanvasNavbarDropdown">
-                  <Link href="/admin/jobs">Lista</Link>
-                  <br></br>
-                </NavDropdown> */}
+
                 <NavDropdown title="Kategoritë" id="offcanvasNavbarDropdown">
-                  <Link to="/admin">Lista</Link>
+                  <Link
+                    to="/admin/categories"
+                    style={{
+                      textDecoration: "none",
+                    }}
+                  >
+                    {" "}
+                    Lista
+                  </Link>
                   <br></br>
-                  <Link to="/admin">Shto</Link>
+                  <Link
+                    to="/admin/categories/create"
+                    style={{
+                      textDecoration: "none",
+                    }}
+                  >
+                    Shto
+                  </Link>
                 </NavDropdown>
+                <br></br>
+
+                <Link
+                  to="/admin/settings"
+                  id="offcanvasNavbarDropdown"
+                  style={{
+                    textDecoration: "none",
+                  }}
+                >
+                  Konfigurimet
+                </Link>
               </Nav>
+              <br></br>
 
               <Nav.Link
                 onClick={() => {

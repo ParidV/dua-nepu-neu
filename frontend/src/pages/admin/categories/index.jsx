@@ -1,89 +1,90 @@
 import NavBar from "../../../components/admin/navbar/NavBar";
-import axios from "axios";
-import React, { useState } from "react";
+import { format } from "date-fns";
+import React, { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
-import { FaTrashAlt } from "react-icons/fa";
-import MuiAlert from "@mui/material/Alert";
+import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import Snackbar from "@mui/material/Snackbar";
 import Swal from "sweetalert2";
-import { useSelector } from "react-redux";
+import CustomAlert from "../../../components/CustomAlert";
+import axios_auth from "../../../utils/axios/authenticated";
+import { FilterComponent } from "../../../components/admin/FilterComponent";
 
-const Alert = React.forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
-const FilterComponent = ({ filterText, onFilter, onClear }) => {
-  return (
-    <div style={{ padding: "20px" }}>
-      <input
-        type="text"
-        className="form-control"
-        placeholder="Search..."
-        value={filterText}
-        onChange={onFilter}
-      />
-      {filterText && (
-        <button className="btn btn-link" onClick={onClear}>
-          Clear
-        </button>
-      )}
-    </div>
-  );
-};
-
-export async function getServerSideProps(context) {
-  const res = await axios.get(`${process.env.API_URL}/admin/categories`);
-  return {
-    props: {
-      categories: res.data,
-    },
-  };
-}
 
 export default function CategoriesIndex() {
-  const session = useSelector((state) => state.user.user);
-
   const [openSuccess, setOpenSuccess] = React.useState(false);
   const [openError, setOpenError] = React.useState(false);
+  const [messageError, setMessageError] = React.useState("");
+  const [messageSuccess, setMessageSuccess] = React.useState("");
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await axios_auth.get(`/admin/categories`);
+        setData(res.data.categories);
+        setLoading(false);
+      } catch (error) {
+        console.log(error);
+        setData([]);
+
+        setTimeout(() => {
+          setMessageError("Pati Nje problem :(");
+          setOpenError(true);
+        }, 3000);
+        setMessageError("");
+        setOpenError(false);
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   const [filterText, setFilterText] = React.useState("");
   const [resetPaginationToggle, setResetPaginationToggle] =
     React.useState(false);
   const filteredItems = data.filter(
     (item) =>
-      item.name && item.name.toLowerCase().includes(filterText.toLowerCase())
+      (item.name &&
+        item.name.toLowerCase().includes(filterText.toLowerCase())) ||
+      (item.User.name &&
+        item.User.name.toLowerCase().includes(filterText.toLowerCase())) ||
+      (item.User.surname &&
+        item.User.surname.toLowerCase().includes(filterText.toLowerCase())) ||
+      (item.User.surname &&
+        item.User.surname.toLowerCase().includes(filterText.toLowerCase()))
   );
 
-  // const columns = [
-  //   {
-  //     name: "Id",
-  //     selector: (row) => row.id,
-  //     sortable: true,
-  //   },
-  //   {
-  //     name: "Emri",
-  //     selector: (row) => row.name,
-  //     sortable: true,
-  //   },
-  // ];
-  // }
-  //  else if (session.role == 3) {
   const columns = [
     {
-      name: "Id",
-      selector: (row) => row.id,
+      name: "Emri Kategorisë",
+      selector: (row) => row.name,
       sortable: true,
     },
     {
-      name: "Emri",
-      selector: (row) => row.name,
+      name: "Krijuar nga",
+      selector: (row) => format(new Date(row.createdAt), "dd/MM/yyyy hh:mm:ss"),
+      sortable: true,
+    },
+    {
+      name: "Krijuar më",
+      selector: (row) => row.User.name + " " + row.User.surname,
       sortable: true,
     },
     {
       name: "actions",
       cell: (row) => (
         <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <Link to={`/admin/categories/${row.id}`}>
+            <FaEdit
+              color="blue"
+              style={{
+                cursor: "pointer",
+                fontSize: "20px",
+                marginRight: "20px",
+              }}
+            />
+          </Link>
           <FaTrashAlt
             color="red"
             // size bigger
@@ -93,50 +94,49 @@ export default function CategoriesIndex() {
               marginRight: "10px",
             }}
             onClick={() => {
-              try {
-                Swal.fire({
-                  title: `Do you want to delete the selected category?`,
-                  text: "You won't be able to revert this!",
-                  icon: "warning",
-                  showCancelButton: true,
-                  confirmButtonColor: "#3085d6",
-                  cancelButtonColor: "#d33",
-                  confirmButtonText: "Yes, delete it!",
-                }).then((result) => {
-                  console.log(result);
-                  //   if (result.isConfirmed) {
-                  //     axios
-                  //       .delete(
-                  //         `${process.env.API_URL}/admin/categories/${row.id}`
-                  //       )
-                  //       .then((res) => {
-                  //         console.log(res.data.success);
-                  //         if (res.data.success) {
-                  //           const filteredData = data.filter(
-                  //             (item) => item.id !== row.id
-                  //           );
-                  //           setData(filteredData);
+              Swal.fire({
+                title: `Doni ta fshini kategorin ${row.name}?`,
+                text: "Fshirja nuk mund të kthehet mbrapsht!",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Fshije!",
+                cancelButtonText: "Anullo",
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  axios_auth
+                    .delete(`/admin/categories/${row.id}`)
+                    .then((res) => {
+                      console.log(res.data.success);
+                      if (res.data.success) {
+                        const filteredData = data.filter(
+                          (item) => item.id !== row.id
+                        );
+                        setData(filteredData);
 
-                  //           setOpenSuccess(true);
-                  //           setTimeout(() => {
-                  //             setOpenSuccess(false);
-                  //           }, 5000);
-                  //         }
-                  //       });
-                  //   }
-                });
-              } catch (error) {
-                console.log(error);
-              }
+                        setMessageSuccess("Kategoria u fshi me sukses!");
+                        setOpenSuccess(true);
+                        setTimeout(() => {
+                          setOpenSuccess(false);
+                          setMessageSuccess("");
+                        }, 5000);
+                      }
+                    })
+                    .catch((err) => {
+                      if (err.response.status !== 200) {
+                        setMessageError("Pati nje problem :(");
+                        setOpenError(true);
+                        setTimeout(() => {
+                          setMessageError("");
+                          setOpenError(false);
+                        }, 5000);
+                      }
+                    });
+                }
+              });
             }}
           />
-          {/* Todo */}
-          {/* <Link to={`/admin/categories/${row.id}`} >
-            <FaEdit
-              color="blue"
-              style={{ cursor: "pointer", fontSize: "20px" }}
-            />
-          </Link> */}
         </div>
       ),
     },
@@ -161,16 +161,21 @@ export default function CategoriesIndex() {
 
   return (
     <>
+      <Snackbar open={loading}>
+        <CustomAlert severity="info" sx={{ width: "100%" }}>
+          Loading
+        </CustomAlert>
+      </Snackbar>
       <Snackbar open={openSuccess} autoHideDuration={200}>
-        <Alert severity="success" sx={{ width: "100%" }}>
-          Kategoria u fshi me sukses
-        </Alert>
+        <CustomAlert severity="success" sx={{ width: "100%" }}>
+          {messageSuccess}
+        </CustomAlert>
       </Snackbar>
 
       <Snackbar open={openError} autoHideDuration={200}>
-        <Alert severity="error" sx={{ width: "100%" }}>
-          Kategoria nuk u fshi!
-        </Alert>
+        <CustomAlert severity="error" sx={{ width: "100%" }}>
+          {messageError}
+        </CustomAlert>
       </Snackbar>
       <NavBar />
       <DataTable
@@ -181,7 +186,6 @@ export default function CategoriesIndex() {
         paginationResetDefaultPage={resetPaginationToggle} // optionally, a hook to reset pagination to page 1
         subHeader
         subHeaderComponent={subHeaderComponentMemo}
-        selectableRows
         persistTableHead
         selectableRowsHighlight
         selectableRowsHighlightAuto

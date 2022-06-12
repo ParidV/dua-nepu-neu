@@ -1,17 +1,15 @@
-import TextField from "@mui/material/TextField";
-import NavBar from "../../../components/admin/navbar/NavBar";
-import Grid from "@mui/material/Grid";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import Snackbar from "@mui/material/Snackbar";
 import { Container, Button } from "@material-ui/core";
 import { useFormik } from "formik";
+import TextField from "@mui/material/TextField";
 import * as yup from "yup";
-import MuiAlert from "@mui/material/Alert";
-import Snackbar from "@mui/material/Snackbar";
-import React from "react";
+import Grid from "@mui/material/Grid";
 import axios_auth from "../../../utils/axios/authenticated";
-
-const Alert = React.forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
+import CustomAlert from "../../../components/CustomAlert";
+import NavBar from "../../../components/admin/navbar/NavBar";
+import { useParams, useNavigate } from "react-router-dom";
 
 const validationSchema = yup.object({
   name: yup
@@ -20,22 +18,53 @@ const validationSchema = yup.object({
     .min(2, "Emri Kategorisë duhet të jetë më i gjatë se 2 karaktere"),
 });
 
-export default function CreateCategory() {
+export default function EditCategory() {
+  const [categoryName, setCategoryNameState] = useState("");
+  const [categoryId, setCategoryId] = useState("");
   const [openSuccess, setOpenSuccess] = React.useState(false);
   const [openError, setOpenError] = React.useState(false);
+  const [loading, setLoading] = React.useState(true);
+
+  let navigate = useNavigate();
+  let { id } = useParams();
+
+  useEffect(() => {
+    async function getCategory() {
+      axios_auth
+        .get(`admin/categories/${id}`)
+        .then((res) => {
+          if (res.data.success) {
+            setCategoryNameState(res.data.category.name);
+            setCategoryId(res.data.category.id);
+            setLoading(false);
+          }
+        })
+        .catch((err) => {
+          if (err.response.status === 404) {
+            navigate("/404");
+          }
+          console.log(err.response.status);
+          console.log(err);
+          setOpenError(true);
+          setLoading(false);
+        });
+    }
+    getCategory();
+  }, []);
+
   const formik = useFormik({
+    enableReinitialize: true,
     initialValues: {
-      name: "",
+      name: categoryName,
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
       axios_auth
-        .post(`/admin/categories`, {
+        .put(`/admin/categories/${categoryId}`, {
           name: values.name,
         })
         .then((res) => {
           if (res.data.success) {
-            formik.resetForm();
             setOpenSuccess(true);
             setTimeout(() => {
               setOpenSuccess(false);
@@ -58,22 +87,29 @@ export default function CreateCategory() {
         });
     },
   });
+  if (loading) {
+    return (
+      <div>
+        <NavBar />
+        <Container>
+          <h1>Loading...</h1>
+        </Container>
+      </div>
+    );
+  }
   return (
     <>
       <NavBar />
-
       <Snackbar open={openSuccess} autoHideDuration={200}>
-        <Alert severity="success" sx={{ width: "100%" }}>
-          Kategoria u shtua me sukses
-        </Alert>
+        <CustomAlert severity="success" sx={{ width: "100%" }}>
+          Kategoria u përditsua me sukses
+        </CustomAlert>
       </Snackbar>
-
       <Snackbar open={openError} autoHideDuration={200}>
-        <Alert severity="error" sx={{ width: "100%" }}>
-          Kategoria nuk u shtua!
-        </Alert>
+        <CustomAlert severity="error" sx={{ width: "100%" }}>
+          Pati një problem gjatë përditësimit të kategorisë
+        </CustomAlert>
       </Snackbar>
-
       <form onSubmit={formik.handleSubmit}>
         <Container>
           <Grid container spacing={12}>
@@ -96,7 +132,7 @@ export default function CreateCategory() {
             className="mt-2"
             type="submit"
           >
-            Ruaj
+            Përditëso
           </Button>
         </Container>
       </form>

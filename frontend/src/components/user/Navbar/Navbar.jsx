@@ -169,7 +169,7 @@ export default function NavBar() {
           <NavLink to="/services">Kërko</NavLink>
           <NavLink to="/contact-us">Kontakt</NavLink>
           {isAuth && session?.role === 2 && (
-            <NavLink to="/protected">Paneli Kompanisë</NavLink>
+            <NavLink to="/company">Paneli Kompanisë</NavLink>
           )}{" "}
           {isAuth && session?.role === 3 && (
             <NavLink to="/admin">Paneli Adminit</NavLink>
